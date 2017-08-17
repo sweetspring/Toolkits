@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<title>批量地址</title>
+	<style type="text/css">
+		body, html{width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		#l-map{height:400px;width:100%;}
+		#r-result{width:100%; font-size:14px;line-height:20px;}
+	</style>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=3Lmv8WafX78Ps72ZSUW5TEBv"></script>
+</head>
+<body>
+	<div id="l-map"></div>
+	<div id="r-result">
+		<input type="button" value="批量地址解析" onclick="bdGEO()" />
+		<div id="result"></div>
+	</div>
+</body>
+</html>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("l-map");
+	//var map = new BMap.Map("allmap");
+	map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);
+
+	var top_left_control = new BMap.ScaleControl({anchor: BMAP_ANCHOR_TOP_LEFT});// 左上角，添加比例尺
+	var top_left_navigation = new BMap.NavigationControl();  //左上角，添加默认缩放平移控件
+	var top_right_navigation = new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_RIGHT, type: BMAP_NAVIGATION_CONTROL_SMALL}); //右上角，仅包含平移和缩放按钮
+	/*缩放控件type有四种类型:
+	BMAP_NAVIGATION_CONTROL_SMALL：仅包含平移和缩放按钮；BMAP_NAVIGATION_CONTROL_PAN:仅包含平移按钮；BMAP_NAVIGATION_CONTROL_ZOOM：仅包含缩放按钮*/
+	
+	//添加控件和比例尺
+	function add_control(){
+		map.addControl(top_left_control);        
+		map.addControl(top_left_navigation);     
+		map.addControl(top_right_navigation);    
+	}
+	//移除控件和比例尺
+	function delete_control(){
+		map.removeControl(top_left_control);     
+		map.removeControl(top_left_navigation);  
+		map.removeControl(top_right_navigation); 
+	}
+
+	map.enableScrollWheelZoom(true);
+	add_control();
+	var index = 0;
+	var myGeo = new BMap.Geocoder();
+	var adds = [
+"上海虹桥机场",
+"上海浦东机场",
+"南京禄口机场",
+"南通兴东机场",
+"无锡硕放机场",
+"常州奔牛机场",
+"徐州观音机场",
+"盐城南洋机场",
+"连云港白塔埠机场",
+"杭州萧山机场",
+"宁波栎社机场",
+"温州永强机场",
+"舟山普陀山机场",
+"黄岩路桥机场",
+"衢州机场",
+"义乌机场",
+"济南遥墙机场",
+"青岛流亭机场",
+"威海大水泊机场",
+"烟台莱山机场",
+"临沂沐埠岭机场",
+"潍坊南苑机场",
+"东营永安机场",
+"济宁曲阜机场",
+"福州长乐机场",
+"厦门高崎机场",
+"泉州晋江机场",
+"龙岩冠豸山机场",
+"武夷山机场",
+"南昌昌北机场",
+"赣州黄金机场",
+"九江庐山机场",
+"景德镇罗家机场",
+"井冈山机场",
+"合肥骆岗机场",
+"黄山屯溪机场",
+"安庆天柱山机场",
+"阜阳西关机场",
+"北京首都机场",
+"北京南苑机场",
+"天津滨海机场",
+"石家庄正定机场",
+"秦皇岛山海关机场",
+"太原武宿机场",
+"大同怀仁机场",
+"长治王村机场",
+"运城关公机场",
+"呼和浩特白塔机场",
+"海拉尔东山机场",
+"赤峰土城子机场",
+"满洲里西郊机场",
+"乌兰浩特机场",
+"锡林浩特机场",
+"乌海机场",
+"包头二里半机场",
+"通辽机场 东北地区机场",
+"沈阳桃仙机场",
+"大连周水子机场",
+"锦州小岭子机场",
+"丹东浪头机场",
+"朝阳机场",
+"长海机场",
+"长春龙嘉机场",
+"吉林二台子机场",
+"延吉朝阳川机场",
+"哈尔滨太平机场",
+"齐齐哈尔三家子机场",
+"佳木斯东郊机场",
+"牡丹江海浪机场",
+"黑河机场",
+"西安咸阳机场",
+"汉中西关机场",
+"延安二十里堡机场",
+"榆林西沙机场",
+"安康五里铺机场",
+"兰州中川机场",
+"敦煌机场",
+"嘉峪关机场",
+"庆阳机场",
+"西宁曹家堡机场",
+"格尔木机场",
+"银川河东机场",
+"乌鲁木齐地窝铺机场",
+"阿克苏温宿机场",
+"喀什机场",
+"伊宁机场",
+"塔城机场",
+"阿尔泰机场",
+"库车机场",
+"且末机场",
+"和田机场",
+"库尔勒机场",
+"那拉提机场",
+"富蕴机场",
+"吐鲁番机场",
+"广州白云机场",
+"深圳宝安机场",
+"珠海三灶机场",
+"汕头外砂机场",
+"湛江机场",
+"梅县机场",
+"佛山机场",
+"南宁吴圩机场",
+"桂林两江机场",
+"柳州白莲机场",
+"北海福城机场",
+"梧州长洲岛机场",
+"百色机场",
+"海口美兰机场",
+"三亚凤凰机场",
+"武汉天河机场",
+"宜昌三峡机场",
+"荆州沙市机场",
+"襄樊刘集机场",
+"恩施许家坪机场",
+"长沙黄花机场",
+"张家界荷花机场",
+"常德桃花源机场",
+"永州零陵机场",
+"怀化芷江机场",
+"郑州新郑机场",
+"洛阳北郊机场",
+"南阳姜营机场",
+"重庆江北机场",
+"万州五桥机场",
+"成都双流机场",
+"泸州蓝田机场",
+"九寨沟黄龙机场",
+"攀枝花保安营机场",
+"南充高坪机场",
+"宜宾莱坝机场",
+"绵阳南郊机场",
+"西昌青山机场",
+"广元盘龙机场",
+"达州河市机场",
+"广汉市广汉机场",
+"昆明巫家坝机场",
+"丽江三义机场",
+"德宏芒市机场",
+"保山云端机场",
+"迪庆香格里拉机场",
+"西双版纳嘎洒机场",
+"文山普者黑机场",
+"大理机场",
+"思茅机场",
+"临沧机场",
+"昭通机场",
+"保山机场",
+"腾冲驼峰机场",
+"贵阳龙洞堡机场",
+"铜仁大兴机场",
+"安顺黄果树机场",
+"兴义机场",
+"黎平机场",
+"遵义新舟机场",
+"拉萨贡嘎机场",
+"昌都邦达机场",
+"林芝机场"
+	];
+	function bdGEO(){
+		var add = adds[index];
+		geocodeSearch(add);
+		index++;
+	}
+	function geocodeSearch(add){
+		if(index < adds.length){
+			setTimeout(window.bdGEO,400);
+		} 
+		myGeo.getPoint(add, function(point){
+			if (point) {
+				document.getElementById("result").innerHTML +=  index + "\t" + add + "\t" + point.lng + "\t" + point.lat + "</br>";
+				var address = new BMap.Point(point.lng, point.lat);
+				addMarker(address,new BMap.Label(index+":"+add,{offset:new BMap.Size(20,-10)}));
+			}
+		}, "合肥市");
+	}
+	// 编写自定义函数,创建标注
+	function addMarker(point,label){
+		var marker = new BMap.Marker(point);
+		map.addOverlay(marker);
+		marker.setLabel(label);
+	}
+</script>
